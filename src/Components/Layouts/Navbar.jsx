@@ -9,15 +9,14 @@ import { FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import TextArea from "./TextArea";
 import { CartContext } from "../Context/CartContex";
 import Cart from "../Pages/Cart";
+import { ProductContext } from "../Context/ProductContext";
 
 function Navbar() {
-  const { cart, total, setTotal, cartAmount } = useContext(CartContext);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const { cart, totalPrice } = useContext(CartContext);
+  const { products, setSearchProducts, searchProducts } =
+    useContext(ProductContext);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    cart.map((item) => setTotalPrice((p) => p + item.price));
-  }, [cart]);
+  const [search, setsearch] = useState("");
 
   return (
     <>
@@ -30,6 +29,8 @@ function Navbar() {
             type="text"
             id="search"
             name="search"
+            value={searchProducts}
+            onChange={(e) => setSearchProducts(e.target.value)}
             placeholder="Search ..."
             className="input input-bordered input-accent w-full max-w-xs"
           />

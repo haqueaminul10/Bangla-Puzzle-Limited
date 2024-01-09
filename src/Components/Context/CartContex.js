@@ -6,8 +6,7 @@ const CartContext = createContext();
 
 const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
-  const [total, setTotal] = useState([]);
-  const [count, setCount] = useState(true);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   const addToCart = (product) => {
     if (cart.length > 0) {
@@ -16,6 +15,8 @@ const CartProvider = ({ children }) => {
       if (isExist.length > 0) {
         const a = cart.map((c) => {
           if (c.id === product.id) {
+            setTotalPrice(totalPrice + c.price);
+
             return { ...c, quantity: c.quantity + 1 };
           } else {
             return c;
@@ -25,34 +26,29 @@ const CartProvider = ({ children }) => {
       } else {
         const a = { ...product, quantity: 1 };
         setCart((prevData) => [...prevData, a]);
+        setTotalPrice(totalPrice + product.price);
       }
     } else {
       const a = { ...product, quantity: 1 };
       setCart((prevData) => [...prevData, a]);
+      setTotalPrice(totalPrice + product.price);
     }
   };
 
   const removeCart = (id) => {
     const updateCart = cart.filter((item) => {
+      setTotalPrice(totalPrice - item.price * item.quantity);
       return item.id !== id;
     });
     setCart(updateCart);
   };
 
-  //   TOTAL COST
-  //   useEffect(() => {
-  //     const total = cart.reduce((all, current) => {
-  //       return all + current.price * current.amount;
-  //     }, 0);
-  //     setTotal(total);
-  //   }, [total]);
-
   const increaseProduct = (id) => {
     const carItem = cart.filter((item) => item.id === id);
-
     if (carItem) {
       const updateCart = cart.map((item) => {
         if (item.id === id) {
+          setTotalPrice(totalPrice + item.price);
           return { ...item, quantity: item.quantity + 1 };
         } else {
           return item;
@@ -68,6 +64,8 @@ const CartProvider = ({ children }) => {
     if (cartItem) {
       const updateCart = cart.map((item) => {
         if (item.id === id && item.quantity > 1) {
+          setTotalPrice(totalPrice - item.price);
+
           return { ...item, quantity: item.quantity - 1 };
         } else {
           return item;
@@ -77,16 +75,6 @@ const CartProvider = ({ children }) => {
     }
   };
 
-  //UPDATE ITEM AMOUNT
-  //   useEffect(() => {
-  //     if (cart) {
-  //       const amount = cart.reduce((total, currentItem) => {
-  //         return total + currentItem.amount;
-  //       }, 0);
-  //       setCartAmount(amount);
-  //     }
-  //   }, [cart]);
-
   return (
     <CartContext.Provider
       value={{
@@ -94,10 +82,9 @@ const CartProvider = ({ children }) => {
         setCart,
         addToCart,
         removeCart,
-        total,
-        setTotal,
         increaseProduct,
         decreaseProduct,
+        totalPrice,
       }}
     >
       {children}
